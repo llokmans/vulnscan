@@ -47,10 +47,31 @@ scanner.check_headers()
 print(scanner.url)
 
 with open("report.html", "w") as f:
-    f.write("<html><head><title>Vulnerability Scan Report</title></head><body>")
-    f.write("<h1>Vulnerability Scan Report</h1>")
-    f.write("<table border='1'><tr><th>URL</th><th>Status Code</th><th>Headers</th></tr>")
+    f.write("""<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Vulnerability Scan Report</title>
+<style>
+body { background: #0f141c; color: #e1e4e8; font-family: 'Courier New', monospace; }
+    h1 { color: #28a745; }
+    table { width: 100%; border-collapse: collapse; }
+    th { background: #1d4ed8; color: white; padding: 16px; }
+    td { padding: 14px; border-bottom: 1px solid #333; }
+    tr:hover { background: #1a1f2e; }
+</style>
+</head>
+<body>
+<h1>🔒 Vulnerability Scan Report</h1>
+<div class="report-container">
+<table>
+<thead><tr><th>URL</th><th>Status Code</th><th>Response Headers</th></tr></thead>
+<tbody>
+""")
     
     for result in scanner.results:
-        f.write(f"<tr><td>{result[1]}</td><td>{result[2]}</td><td>{result[3]}</td></tr>")
-    f.write("</table></body></html>")
+        f.write(f"<tr><td>{result[1]}</td><td>{result[2]}</td><td><pre>{result[3]}</pre></td></tr>")
+    
+    f.write("""</tbody></table></div></body></html>""")   
+
+    
+    

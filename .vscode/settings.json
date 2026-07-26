@@ -1,5 +1,6 @@
 {
     "cSpell.words": [
+        "gunicorn",
         "vulnscan"
     ],
     "python.analysis.extraPaths": [
