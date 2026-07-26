@@ -1,5 +1,6 @@
 import sqlite3
 import requests
+from colorama import Fore, Style # type: ignore
 
 class VulnScanner:
     def __init__(self,url):
@@ -9,23 +10,23 @@ class VulnScanner:
         try:
             response = requests.get(self.url)
             if response.status_code == 200:
-                print(f"URL {self.url} is reachable.")
+                print(f"{Fore.GREEN}URL {self.url} is reachable.{Style.RESET_ALL}")
             else:
-                print(f"URL {self.url} returned status code {response.status_code}.")
-            self.save_results(response.status_code, {})
+                print(f"{Fore.RED}URL {self.url} returned status code {response.status_code}.{Style.RESET_ALL}")
+            self.results.append(("status", self.url, response.status_code, ""))
         except requests.exceptions.RequestException as e:
-            print(f"Error reaching URL {self.url}: {e}")
+            print(f"{Fore.RED}Error reaching URL {self.url}: {e}{Style.RESET_ALL}")
             
     def check_headers(self):
         try:
             response = requests.get(self.url)
             headers = response.headers
-            print(f"Headers for {self.url}:")
+            print(f"{Fore.GREEN}Headers for {self.url}:{Style.RESET_ALL}")
             for key, value in headers.items():
-                print(f"{key}: {value}")
-            self.save_results(response.status_code, dict(headers))
+                print(f"{Fore.CYAN}{key}: {value}{Style.RESET_ALL}")
+            self.results.append(("headers", self.url, response.status_code, str(dict(headers))))
         except requests.exceptions.RequestException as e:
-            print(f"Error retrieving headers for URL {self.url}: {e}")
+            print(f"{Fore.RED}Error retrieving headers for URL {self.url}: {e}{Style.RESET_ALL}")
             
             
     def save_results(self, status_code, headers):
@@ -35,6 +36,9 @@ class VulnScanner:
         cursor.execute("INSERT INTO scans (url, status_code, headers) VALUES (?, ?, ?)", (self.url, status_code, str(headers)))
         conn.commit()
         conn.close()
+        
+
+    
 
 scanner = VulnScanner("https://httpbin.org")
 scanner.check_status()    
@@ -42,3 +46,11 @@ scanner.check_headers()
 
 print(scanner.url)
 
+with open("report.html", "w") as f:
+    f.write("<html><head><title>Vulnerability Scan Report</title></head><body>")
+    f.write("<h1>Vulnerability Scan Report</h1>")
+    f.write("<table border='1'><tr><th>URL</th><th>Status Code</th><th>Headers</th></tr>")
+    
+    for result in scanner.results:
+        f.write(f"<tr><td>{result[1]}</td><td>{result[2]}</td><td>{result[3]}</td></tr>")
+    f.write("</table></body></html>")
