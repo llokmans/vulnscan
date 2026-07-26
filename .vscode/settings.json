@@ -1,0 +1,8 @@
+{
+    "cSpell.words": [
+        "vulnscan"
+    ],
+    "python.analysis.extraPaths": [
+        "./my_"
+    ]
+}
