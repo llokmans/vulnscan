@@ -39,21 +39,19 @@ class VulnScanner:
         
 
     
+class ReportGenerator:
+    def __init__(self, results):
+        self.results = results
 
-scanner = VulnScanner("https://httpbin.org")
-scanner.check_status()    
-scanner.check_headers()
-
-print(scanner.url)
-
-with open("report.html", "w") as f:
-    f.write("""<!DOCTYPE html>
+    def generate_html_report(self, filename="report.html"):
+        with open(filename, "w") as f:
+            f.write("""<!DOCTYPE html>
 <html lang="en">
 <head>
 <title>Vulnerability Scan Report</title>
 <style>
 body { background: #0f141c; color: #e1e4e8; font-family: 'Courier New', monospace; }
-    h1 { color: #28a745; }
+    h1 { color: #28a745; } 
     table { width: 100%; border-collapse: collapse; }
     th { background: #1d4ed8; color: white; padding: 16px; }
     td { padding: 14px; border-bottom: 1px solid #333; }
@@ -67,11 +65,15 @@ body { background: #0f141c; color: #e1e4e8; font-family: 'Courier New', monospac
 <thead><tr><th>URL</th><th>Status Code</th><th>Response Headers</th></tr></thead>
 <tbody>
 """)
+            for result in self.results:
+                f.write(f"<tr><td>{result[1]}</td><td>{result[2]}</td><td><pre>{result[3]}</pre></td></tr>")
+            f.write("""</tbody></table></div></body></html>""")
     
-    for result in scanner.results:
-        f.write(f"<tr><td>{result[1]}</td><td>{result[2]}</td><td><pre>{result[3]}</pre></td></tr>")
-    
-    f.write("""</tbody></table></div></body></html>""")   
+scanner = VulnScanner("http://example.org")
+scanner.check_status()
+scanner.check_headers()
 
-    
-    
+report = ReportGenerator(scanner.results)
+report.generate_html_report()
+
+print("Report Generated:")
